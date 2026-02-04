@@ -1,21 +1,87 @@
-import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
-import { z } from "zod";
+import sequelize from "@/config/dbconfig";
+import {
+	CreationOptional,
+	DataTypes,
+	InferAttributes,
+	InferCreationAttributes,
+	Model,
+} from "sequelize";
+import bcrypt from "bcrypt";
 
-import { commonValidations } from "@/common/utils/commonValidation";
+class User extends Model<
+	InferAttributes<User, { omit: "createdAt" | "updatedAt" }>,
+	InferCreationAttributes<User, { omit: "createdAt" | "updatedAt" }>
+> {
+	declare id: CreationOptional<string>;
+	declare email: string;
+	declare password: string;
+	declare firstName: string;
+	declare lastName: string;
+	declare createdAt: CreationOptional<Date>;
+	declare updatedAt: CreationOptional<Date>;
 
-extendZodWithOpenApi(z);
+	static async login(email: string, password: string): Promise<User | null> {
+		const user = await User.scope("withPassword").findOne({ where: { email } });
 
-export type User = z.infer<typeof UserSchema>;
-export const UserSchema = z.object({
-	id: z.string().min(1),
-	name: z.string(),
-	email: z.string().email(),
-	age: z.number(),
-	createdAt: z.date(),
-	updatedAt: z.date(),
-});
+		if (!user) {
+			throw new Error("Invalid email or password");
+		}
 
-// Input Validation for 'GET users/:id' endpoint
-export const GetUserSchema = z.object({
-	params: z.object({ id: commonValidations.id }),
-});
+		const auth = await bcrypt.compare(password, user.password);
+
+		if (!auth) {
+			throw new Error("Invalid email or password");
+		}
+
+		const userWithoutPassword = await User.findByPk(user.id);
+		return userWithoutPassword;
+	}
+}
+
+User.init(
+	{
+		id: {
+			type: DataTypes.UUID,
+			defaultValue: DataTypes.UUIDV4,
+			allowNull: false,
+			primaryKey: true,
+		},
+		email: {
+			type: DataTypes.STRING,
+			allowNull: false,
+			unique: true,
+		},
+		password: {
+			type: DataTypes.STRING,
+			allowNull: false,
+		},
+		firstName: {
+			type: DataTypes.STRING,
+			allowNull: false,
+		},
+		lastName: {
+			type: DataTypes.STRING,
+			allowNull: false,
+		},
+	},
+	{
+		sequelize,
+		timestamps: true,
+		defaultScope: {
+			attributes: { exclude: ["password"] },
+		},
+		scopes: {
+			withPassword: {
+				attributes: {} as any,
+			},
+		},
+		hooks: {
+			async beforeCreate(user, options) {
+				const salt = await bcrypt.genSalt();
+				user.dataValues.password = await bcrypt.hash(user.dataValues.password, salt);
+			},
+		},
+	},
+);
+
+export default User;

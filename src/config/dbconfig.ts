@@ -2,13 +2,13 @@ import { env } from "@/common/utils/envConfig";
 import { dbConfigInterface } from "@/interfaces/config";
 import { Sequelize } from "sequelize";
 
-const { DB_USER, HOST, DB, PASSWORD } = env;
+const { DB_USER, HOST, PASSWORD } = env;
 
 const dbConfig: dbConfigInterface = {
 	HOST,
 	USER: DB_USER,
 	PASSWORD,
-	DB,
+	DB: process.env.DB!,
 	dialect: "mysql",
 
 	pool: {

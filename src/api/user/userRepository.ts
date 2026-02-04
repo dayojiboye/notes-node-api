@@ -1,30 +1,16 @@
-import type { User } from "@/api/user/userModel";
-
-export const users: User[] = [
-	{
-		id: "1",
-		name: "Alice",
-		email: "alice@example.com",
-		age: 42,
-		createdAt: new Date(),
-		updatedAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days later
-	},
-	{
-		id: "2",
-		name: "Robert",
-		email: "Robert@example.com",
-		age: 21,
-		createdAt: new Date(),
-		updatedAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days later
-	},
-];
+import { ISignup } from "@/schemas/auth";
+import { IUser } from "@/schemas/user";
+import User from "./userModel";
 
 export class UserRepository {
-	async findAllAsync(): Promise<User[]> {
-		return users;
+	public async createUser(payload: ISignup): Promise<IUser> {
+		const user = await User.create(payload);
+		const userWithoutPassword = await User.findByPk(user.id);
+		return userWithoutPassword!.toJSON();
 	}
 
-	async findByIdAsync(id: string): Promise<User | null> {
-		return users.find((user) => user.id === id) || null;
+	public async findUserByEmail(email: string): Promise<IUser | null> {
+		const user = await User.findOne({ where: { email } });
+		return user ? user.toJSON() : null;
 	}
 }

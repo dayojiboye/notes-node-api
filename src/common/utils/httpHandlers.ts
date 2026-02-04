@@ -10,24 +10,25 @@ export const validateRequest =
 			await schema.parseAsync({ body: req.body, query: req.query, params: req.params });
 			next();
 		} catch (err) {
-			const errors = (err as ZodError).errors.map((e) => {
-				const fieldPath = e.path.length > 0 ? e.path.join(".") : "root";
-				return `${fieldPath}: ${e.message}`;
+			const zodError = err as ZodError;
+
+			const fieldErrors: Record<string, string[]> = {};
+
+			zodError.errors.forEach((e) => {
+				const field = e.path.slice(1).join(".") || "root";
+
+				if (!fieldErrors[field]) {
+					fieldErrors[field] = [];
+				}
+
+				fieldErrors[field].push(e.message);
 			});
 
-			const cleanedErrors = errors.map((e) => {
-				const field = e
-					.split(":")[0]
-					.replace(/^body\./, "")
-					.replace(/^query\./, "")
-					.replace(/^params\./, "");
-				return `${field} is required`;
+			const errorMessages = Object.entries(fieldErrors).map(([field, messages]) => {
+				return messages[0];
 			});
 
-			const errorMessage =
-				cleanedErrors.length === 1
-					? `Invalid input: ${cleanedErrors[0]}`
-					: `Invalid input (${cleanedErrors.length} errors): ${cleanedErrors.join("; ")}`;
+			const errorMessage = errorMessages[0];
 
 			const statusCode = StatusCodes.BAD_REQUEST;
 			const serviceResponse = ServiceResponse.failure(errorMessage, null, statusCode);
