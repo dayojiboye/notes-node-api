@@ -14,7 +14,7 @@ const envSchema = z.object({
 
 	PASSWORD: z.string().default(""),
 
-	DB: z.string().min(1).default("simple-node-todo"),
+	DB: z.string().min(1).default("notes-node-db"),
 
 	CORS_ORIGIN: z.string().url().default("http://localhost:8080"),
 
