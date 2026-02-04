@@ -1,10 +1,11 @@
-import { ISignup, SignupSchema } from "@/schemas/auth";
+import { ILogin, ISignup, LoginSchema, SignupSchema } from "@/schemas/auth";
 import { AuthRepository } from "./authRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { IAuthResponse } from "@/schemas/user";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
 import { userService } from "../user/userService";
+import { defaultAuthErrorMessage } from "@/common/constants/messages";
 
 class AuthService {
 	private authRepository: AuthRepository;
@@ -45,6 +46,47 @@ class AuthService {
 				null,
 				StatusCodes.INTERNAL_SERVER_ERROR,
 			);
+		}
+	}
+
+	public async login(payload: ILogin): Promise<ServiceResponse<IAuthResponse | null>> {
+		try {
+			const { error } = LoginSchema.shape.body.safeParse(payload);
+
+			if (error) {
+				return ServiceResponse.failure(error.message, null, StatusCodes.BAD_REQUEST);
+			}
+
+			const emailExists = await userService.getUserByEmail(payload.email);
+
+			if (!emailExists) {
+				return ServiceResponse.failure(defaultAuthErrorMessage, null, StatusCodes.CONFLICT);
+			}
+
+			const user = await this.authRepository.loginUser(payload);
+
+			if (!user) {
+				return ServiceResponse.failure(defaultAuthErrorMessage, null, StatusCodes.CONFLICT);
+			}
+
+			const accessToken = this.createToken(user.id);
+
+			const authResponse: IAuthResponse = {
+				user: user,
+				accessToken: {
+					token: accessToken,
+					expiryTimeInMinutes: process.env.ACCESS_TOKEN_MAX_AGE_MINUTES!,
+				},
+			};
+
+			return ServiceResponse.success<IAuthResponse>("Request processed successfully", authResponse);
+		} catch (error) {
+			let errorMessage: string;
+
+			if (error instanceof Error) errorMessage = error.message;
+			else errorMessage = "An error occurred, please try again";
+
+			return ServiceResponse.failure(errorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 

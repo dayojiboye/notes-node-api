@@ -7,6 +7,7 @@ import {
 	Model,
 } from "sequelize";
 import bcrypt from "bcrypt";
+import { defaultAuthErrorMessage } from "@/common/constants/messages";
 
 class User extends Model<
 	InferAttributes<User, { omit: "createdAt" | "updatedAt" }>,
@@ -24,13 +25,13 @@ class User extends Model<
 		const user = await User.scope("withPassword").findOne({ where: { email } });
 
 		if (!user) {
-			throw new Error("Invalid email or password");
+			throw new Error(defaultAuthErrorMessage);
 		}
 
 		const auth = await bcrypt.compare(password, user.password);
 
 		if (!auth) {
-			throw new Error("Invalid email or password");
+			throw new Error(defaultAuthErrorMessage);
 		}
 
 		const userWithoutPassword = await User.findByPk(user.id);

@@ -6,6 +6,11 @@ class AuthController {
 		const serviceResponse = await authService.signup(req.body);
 		return res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
+
+	public login: RequestHandler = async (req: Request, res: Response) => {
+		const serviceResponse = await authService.login(req.body);
+		return res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
 }
 
 export const authController = new AuthController();

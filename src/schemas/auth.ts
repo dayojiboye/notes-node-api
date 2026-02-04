@@ -23,5 +23,10 @@ export const SignupSchema = z.object({
 	}),
 });
 
+export const LoginSchema = z.object({
+	body: AuthSchema,
+});
+
 export type IAuth = z.infer<typeof AuthSchema>;
 export type ISignup = z.infer<typeof SignupSchema>["body"];
+export type ILogin = z.infer<typeof LoginSchema>["body"];

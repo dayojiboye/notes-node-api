@@ -3,7 +3,7 @@ import express, { Router } from "express";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { AuthResponseSchema } from "@/schemas/user";
-import { SignupSchema } from "@/schemas/auth";
+import { LoginSchema, SignupSchema } from "@/schemas/auth";
 import { authController } from "./authController";
 import apiBaseUrl from "@/config/apiBaseUrl";
 
@@ -29,3 +29,21 @@ authRegistry.registerPath({
 });
 
 authRouter.post("/register", validateRequest(SignupSchema), authController.signup);
+
+authRegistry.registerPath({
+	method: "post",
+	path: `${apiBaseUrl}/auth/login`,
+	tags: ["Auth Service"],
+	request: {
+		body: {
+			content: {
+				"application/json": {
+					schema: LoginSchema.shape.body,
+				},
+			},
+		},
+	},
+	responses: createApiResponse(AuthResponseSchema, "Success"),
+});
+
+authRouter.post("/login", validateRequest(LoginSchema), authController.login);

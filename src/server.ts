@@ -10,6 +10,7 @@ import requestLogger from "@/common/middleware/requestLogger";
 import { env } from "@/common/utils/envConfig";
 import apiBaseUrl from "./config/apiBaseUrl";
 import { authRouter } from "./api/auth/authRouter";
+import checkUser from "./common/middleware/checkUserHandler";
 
 const logger = pino({ name: "server start" });
 const app: Express = express();
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
 app.use(helmet());
 app.use(rateLimiter);
+app.use(`${apiBaseUrl}`, checkUser);
 
 // Request logging
 app.use(requestLogger);

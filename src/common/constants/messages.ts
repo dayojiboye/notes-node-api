@@ -7,3 +7,4 @@ export const invalidTokenMessage = "Invalid token";
 export const userNotFoundMessage = "No user found";
 export const noteNotFoundMessage = "No note found";
 export const categoryNotFoundMessage = "No category found";
+export const defaultAuthErrorMessage = "Invalid email or password";
