@@ -31,9 +31,11 @@ class AuthService {
 			const accessToken = this.createToken(user.id);
 
 			const authResponse: IAuthResponse = {
-				...user,
-				accessToken: accessToken,
-				expiryTimeInMinutes: process.env.ACCESS_TOKEN_MAX_AGE_MINUTES,
+				user: user,
+				accessToken: {
+					token: accessToken,
+					expiryTimeInMinutes: process.env.ACCESS_TOKEN_MAX_AGE_MINUTES!,
+				},
 			};
 
 			return ServiceResponse.success<IAuthResponse>("Request processed successfully", authResponse);

@@ -11,11 +11,14 @@ export const UserSchema = z.object({
 });
 
 export const TokenSchema = z.object({
-	accessToken: z.string().min(1, "Access token not available"),
-	expiryTimeInMinutes: z.string().min(1, "Expiry time in minutes not available").optional(),
+	token: z.string().min(1, "Access token not available"),
+	expiryTimeInMinutes: z.string().min(1, "Expiry time in minutes not available"),
 });
 
-export const AuthResponseSchema = UserSchema.merge(TokenSchema);
+export const AuthResponseSchema = z.object({
+	user: UserSchema,
+	accessToken: TokenSchema,
+});
 
 export type IUser = z.infer<typeof UserSchema>;
 export type IAuthResponse = z.infer<typeof AuthResponseSchema>;
