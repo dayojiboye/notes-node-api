@@ -15,6 +15,7 @@ class Note extends Model<
 	declare category: string;
 	declare content: string;
 	declare attachments: string[];
+	declare isPinned: boolean;
 	declare authorId: string;
 	declare categoryId: string;
 	declare createdAt: CreationOptional<Date>;
@@ -42,6 +43,11 @@ Note.init(
 			type: DataTypes.JSON,
 			allowNull: false,
 			defaultValue: [],
+		},
+		isPinned: {
+			type: DataTypes.BOOLEAN,
+			allowNull: false,
+			defaultValue: false,
 		},
 		authorId: {
 			type: DataTypes.UUID,

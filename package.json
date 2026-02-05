@@ -42,6 +42,7 @@
 		"@types/swagger-ui-express": "4.1.8",
 		"@vitest/coverage-v8": "3.2.4",
 		"pino-pretty": "13.1.1",
+		"sequelize-cli": "^6.6.5",
 		"supertest": "7.1.4",
 		"ts-node": "^10.9.2",
 		"tsup": "8.5.0",
