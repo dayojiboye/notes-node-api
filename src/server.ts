@@ -13,6 +13,7 @@ import { authRouter } from "./api/auth/authRouter";
 import checkUser from "./common/middleware/checkUserHandler";
 import { userRouter } from "./api/user/userRouter";
 import validateToken from "./common/middleware/validateTokenHandler";
+import { noteRouter } from "./api/note/noteRouter";
 
 const logger = pino({ name: "server start" });
 const app: Express = express();
@@ -35,6 +36,7 @@ app.use(requestLogger);
 app.use("/health-check", healthCheckRouter);
 app.use(`${apiBaseUrl}/auth`, authRouter);
 app.use(`${apiBaseUrl}/user`, validateToken, userRouter);
+app.use(`${apiBaseUrl}/note`, validateToken, noteRouter);
 
 // Swagger UI
 app.use(openAPIRouter);

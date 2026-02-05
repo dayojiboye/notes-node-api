@@ -11,7 +11,7 @@ const multerErrorHandler: ErrorRequestHandler = (err, _req, res, next) => {
 		if (err.code === "LIMIT_FILE_COUNT") {
 			return res.status(StatusCodes.BAD_REQUEST).json({
 				success: false,
-				message: "Maximum 5 files allowed per upload",
+				message: "Maximum of 5 files allowed per upload",
 			});
 		}
 

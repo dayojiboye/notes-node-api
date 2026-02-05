@@ -10,23 +10,26 @@ export const AttachmentSchema = z.object({
 });
 
 export const NoteSchema = z.object({
-	category: z.string().trim().optional(),
+	categoryId: z.string().optional().nullable(),
 	content: z.string().trim().min(1, "Enter content for note"),
 	isPinned: z
-		.string()
+		.enum(["true", "false"])
 		.optional()
-		.transform((val) => val === "true"),
+		.transform((val) => val === "true")
+		.default("false"),
 });
 
 export const NoteResponseSchema = NoteSchema.extend({
 	id: z.string(),
-	authorId: z.string(),
-	categoryId: z.string(),
+	authorId: z.string().min(1, "Author ID is required"),
 	attachments: z.array(AttachmentSchema).max(5, "Maximum 5 attachments allowed").default([]),
+	isPinned: z.boolean().default(false),
 });
 
 export const CreateNoteSchema = z.object({
-	body: NoteSchema,
+	body: NoteSchema.extend({
+		authorId: z.string().min(1, "Author ID is required"),
+	}),
 });
 
 export type IAttachment = z.infer<typeof AttachmentSchema>;

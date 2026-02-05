@@ -2,8 +2,8 @@ import { imagekit } from "@/config/imagekit";
 import { IAttachment } from "@/schemas/note";
 import { UploadResponse } from "imagekit/dist/libs/interfaces";
 
-class ImageKitService {
-	public async uploadToImageKit(file: Express.Multer.File): Promise<IAttachment> {
+export class ImageKitService {
+	static async uploadToImageKit(file: Express.Multer.File): Promise<IAttachment> {
 		try {
 			const result: UploadResponse = await imagekit.upload({
 				file: file.buffer,
@@ -23,7 +23,7 @@ class ImageKitService {
 		}
 	}
 
-	public async deleteFromImageKit(fileId: string): Promise<void> {
+	static async deleteFromImageKit(fileId: string): Promise<void> {
 		try {
 			await imagekit.deleteFile(fileId);
 		} catch (error) {
@@ -32,9 +32,7 @@ class ImageKitService {
 		}
 	}
 
-	public async deleteMultipleFiles(fileIds: string[]): Promise<void> {
+	static async deleteMultipleFiles(fileIds: string[]): Promise<void> {
 		await Promise.all(fileIds.map((fileId) => this.deleteFromImageKit(fileId)));
 	}
 }
-
-export const imageKitService = new ImageKitService();

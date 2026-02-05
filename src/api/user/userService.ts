@@ -71,7 +71,8 @@ class UserService {
 				return ServiceResponse.failure("User not found", null, StatusCodes.NOT_FOUND);
 			}
 
-			return ServiceResponse.success<IUser>("Password updated successfully", updatedUser);
+			const validatedUser = UserSchema.parse(updatedUser);
+			return ServiceResponse.success<IUser>("Password updated successfully", validatedUser);
 		} catch (error) {
 			return ServiceResponse.failure(
 				"An error occurred while updating user password",

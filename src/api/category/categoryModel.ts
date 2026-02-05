@@ -30,6 +30,7 @@ Category.init(
 		title: {
 			type: DataTypes.STRING,
 			allowNull: false,
+			unique: true,
 		},
 		emoji: {
 			type: DataTypes.STRING,
@@ -37,7 +38,7 @@ Category.init(
 		},
 		categoryAuthorId: {
 			type: DataTypes.UUID,
-			allowNull: true,
+			allowNull: false,
 		},
 	},
 	{

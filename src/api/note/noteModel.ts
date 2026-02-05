@@ -12,12 +12,11 @@ class Note extends Model<
 	InferCreationAttributes<Note, { omit: "createdAt" | "updatedAt" }>
 > {
 	declare id: CreationOptional<string>;
-	declare category: string;
 	declare content: string;
 	declare attachments: { fileId: string; url: string; name: string }[];
 	declare isPinned: boolean;
 	declare authorId: string;
-	declare categoryId: string;
+	declare categoryId?: string | null;
 	declare createdAt: CreationOptional<Date>;
 	declare updatedAt: CreationOptional<Date>;
 }
@@ -29,11 +28,6 @@ Note.init(
 			defaultValue: DataTypes.UUIDV4,
 			allowNull: false,
 			primaryKey: true,
-		},
-		category: {
-			type: DataTypes.STRING,
-			defaultValue: "",
-			allowNull: false,
 		},
 		content: {
 			type: DataTypes.TEXT,
@@ -51,11 +45,12 @@ Note.init(
 		},
 		authorId: {
 			type: DataTypes.UUID,
-			allowNull: true,
+			allowNull: false,
 		},
 		categoryId: {
 			type: DataTypes.UUID,
 			allowNull: true,
+			defaultValue: null,
 		},
 	},
 	{
