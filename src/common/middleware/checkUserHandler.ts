@@ -11,7 +11,7 @@ function checkUser(req: Request, res: Response, next: NextFunction) {
 	if (authHeader && authHeader.startsWith("Bearer")) {
 		token = authHeader.split("Bearer ")[1];
 		if (token) {
-			jwt.verify(token, process.env.JWT_ACCESS_TOKEN_SECRET!, async (err, decodedToken: any) => {
+			jwt.verify(token, process.env.JWT_SECRET_KEY!, async (err, decodedToken: any) => {
 				if (err) {
 					res.locals.user = null;
 					next();

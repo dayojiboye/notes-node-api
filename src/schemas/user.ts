@@ -1,3 +1,4 @@
+import { commonValidations } from "@/common/utils/commonValidation";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 
@@ -20,5 +21,30 @@ export const AuthResponseSchema = z.object({
 	accessToken: TokenSchema,
 });
 
+export const UpdatePasswordSchema = z.object({
+	params: z.object({ userId: commonValidations.id }),
+	body: z
+		.object({
+			email: z.string().email("Enter a valid email address").trim(),
+			oldPassword: z.string().trim().min(8, "Current password must be at least 8 characters"),
+			newPassword: z
+				.string()
+				.trim()
+				.min(8, "New password must be at least 8 characters")
+				.refine(
+					(val) =>
+						/[A-Z]/.test(val) && /[a-z]/.test(val) && /[0-9]/.test(val) && /[^A-Za-z0-9]/.test(val),
+					"New password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+				),
+			confirmNewPassword: z.string().trim().min(8, { message: "Re-enter new password" }),
+		})
+		.refine((data) => data.newPassword === data.confirmNewPassword, {
+			message: "Passwords do not match",
+			path: ["confirmNewPassword"],
+		}),
+});
+
 export type IUser = z.infer<typeof UserSchema>;
 export type IAuthResponse = z.infer<typeof AuthResponseSchema>;
+export type IUpdatePasswordBody = z.infer<typeof UpdatePasswordSchema>["body"];
+export type IUpdatePasswordParams = z.infer<typeof UpdatePasswordSchema>["params"];

@@ -11,6 +11,8 @@ import { env } from "@/common/utils/envConfig";
 import apiBaseUrl from "./config/apiBaseUrl";
 import { authRouter } from "./api/auth/authRouter";
 import checkUser from "./common/middleware/checkUserHandler";
+import { userRouter } from "./api/user/userRouter";
+import validateToken from "./common/middleware/validateTokenHandler";
 
 const logger = pino({ name: "server start" });
 const app: Express = express();
@@ -32,6 +34,7 @@ app.use(requestLogger);
 // Routes
 app.use("/health-check", healthCheckRouter);
 app.use(`${apiBaseUrl}/auth`, authRouter);
+app.use(`${apiBaseUrl}/user`, validateToken, userRouter);
 
 // Swagger UI
 app.use(openAPIRouter);

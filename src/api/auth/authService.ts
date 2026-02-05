@@ -60,13 +60,13 @@ class AuthService {
 			const emailExists = await userService.getUserByEmail(payload.email);
 
 			if (!emailExists) {
-				return ServiceResponse.failure(defaultAuthErrorMessage, null, StatusCodes.CONFLICT);
+				return ServiceResponse.failure(defaultAuthErrorMessage, null, StatusCodes.NOT_FOUND);
 			}
 
 			const user = await this.authRepository.loginUser(payload);
 
 			if (!user) {
-				return ServiceResponse.failure(defaultAuthErrorMessage, null, StatusCodes.CONFLICT);
+				return ServiceResponse.failure(defaultAuthErrorMessage, null, StatusCodes.NOT_FOUND);
 			}
 
 			const accessToken = this.createToken(user.id);
@@ -86,7 +86,11 @@ class AuthService {
 			if (error instanceof Error) errorMessage = error.message;
 			else errorMessage = "An error occurred, please try again";
 
-			return ServiceResponse.failure(errorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure(
+				errorMessage,
+				null,
+				error instanceof Error ? StatusCodes.BAD_REQUEST : StatusCodes.INTERNAL_SERVER_ERROR,
+			);
 		}
 	}
 
