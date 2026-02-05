@@ -1,7 +1,4 @@
-import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
-
-extendZodWithOpenApi(z);
 
 export const AttachmentSchema = z.object({
 	fileId: z.string(),
@@ -24,6 +21,8 @@ export const NoteResponseSchema = NoteSchema.extend({
 	authorId: z.string().min(1, "Author ID is required"),
 	attachments: z.array(AttachmentSchema).max(5, "Maximum 5 attachments allowed").default([]),
 	isPinned: z.boolean().default(false),
+	createdAt: z.coerce.date(),
+	updatedAt: z.coerce.date(),
 });
 
 export const CreateNoteSchema = z.object({

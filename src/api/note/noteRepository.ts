@@ -11,6 +11,6 @@ export class NoteRepository {
 			attachments,
 		});
 
-		return newNote.toJSON();
+		return newNote;
 	}
 }
