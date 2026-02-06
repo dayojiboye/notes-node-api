@@ -5,7 +5,11 @@ import { IAuthResponse } from "@/schemas/user";
 import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
 import { userService } from "../user/userService";
-import { defaultAuthErrorMessage } from "@/common/constants/messages";
+import {
+	defaultAuthErrorMessage,
+	defaultSuccessMessage,
+	serverErrorMessage,
+} from "@/common/constants/messages";
 
 class AuthService {
 	private authRepository: AuthRepository;
@@ -39,13 +43,9 @@ class AuthService {
 				},
 			};
 
-			return ServiceResponse.success<IAuthResponse>("Request processed successfully", authResponse);
+			return ServiceResponse.success<IAuthResponse>(defaultSuccessMessage, authResponse);
 		} catch (error) {
-			return ServiceResponse.failure(
-				"An error occurred, please try again",
-				null,
-				StatusCodes.INTERNAL_SERVER_ERROR,
-			);
+			return ServiceResponse.failure(serverErrorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -79,12 +79,12 @@ class AuthService {
 				},
 			};
 
-			return ServiceResponse.success<IAuthResponse>("Request processed successfully", authResponse);
+			return ServiceResponse.success<IAuthResponse>(defaultSuccessMessage, authResponse);
 		} catch (error) {
 			let errorMessage: string;
 
 			if (error instanceof Error) errorMessage = error.message;
-			else errorMessage = "An error occurred, please try again";
+			else errorMessage = serverErrorMessage;
 
 			return ServiceResponse.failure(
 				errorMessage,

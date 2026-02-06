@@ -19,6 +19,15 @@ class NoteController {
 		const serviceResponse = await noteService.createNote(notePayload, attachments);
 		return res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
+
+	public getUserNotes: RequestHandler = async (req: Request, res: Response) => {
+		const serviceResponse = await noteService.getUserNotes(
+			res.locals.user.id,
+			req.query.searchText as string | undefined,
+			Number(req.query.page as string) || 1,
+		);
+		return res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
 }
 
 export const noteController = new NoteController();

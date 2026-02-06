@@ -5,6 +5,7 @@ import { ISignup } from "@/schemas/auth";
 import { StatusCodes } from "http-status-codes";
 import bcrypt from "bcrypt";
 import User from "./userModel";
+import { serverErrorMessage } from "@/common/constants/messages";
 
 class UserService {
 	private userRepository: UserRepository;
@@ -74,11 +75,7 @@ class UserService {
 			const validatedUser = UserSchema.parse(updatedUser);
 			return ServiceResponse.success<IUser>("Password updated successfully", validatedUser);
 		} catch (error) {
-			return ServiceResponse.failure(
-				"An error occurred while updating user password",
-				null,
-				StatusCodes.INTERNAL_SERVER_ERROR,
-			);
+			return ServiceResponse.failure(serverErrorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

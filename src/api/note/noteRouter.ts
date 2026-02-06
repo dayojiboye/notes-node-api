@@ -1,7 +1,12 @@
 import { createApiResponse } from "@/api-docs/openAPIResponseBuilders";
 import { validateRequest } from "@/common/utils/httpHandlers";
 import apiBaseUrl from "@/config/apiBaseUrl";
-import { CreateNoteSchema, NoteResponseSchema } from "@/schemas/note";
+import {
+	CreateNoteSchema,
+	NoteResponseSchema,
+	NotesQuerySchema,
+	NotesResponseSchema,
+} from "@/schemas/note";
 import { extendZodWithOpenApi, OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import express, { Router } from "express";
 import { noteController } from "./noteController";
@@ -43,3 +48,17 @@ noteRouter.post(
 	validateRequest(CreateNoteSchema),
 	noteController.createNote,
 );
+
+noteRegistry.registerPath({
+	method: "get",
+	path: `${apiBaseUrl}/note`,
+	tags: ["Note Service"],
+	request: {
+		query: NotesQuerySchema.shape.query.extend({
+			page: z.number().default(1),
+		}),
+	},
+	responses: createApiResponse(NotesResponseSchema, "Success"),
+});
+
+noteRouter.get("/", validateRequest(NotesQuerySchema), noteController.getUserNotes);

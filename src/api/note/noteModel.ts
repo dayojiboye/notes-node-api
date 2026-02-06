@@ -37,6 +37,10 @@ Note.init(
 			type: DataTypes.JSON,
 			allowNull: false,
 			defaultValue: [],
+			get() {
+				const value = this.getDataValue("attachments");
+				return typeof value === "string" ? JSON.parse(value) : value;
+			},
 		},
 		isPinned: {
 			type: DataTypes.BOOLEAN,

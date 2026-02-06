@@ -1,8 +1,15 @@
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { NoteRepository } from "./noteRepository";
-import { ICreateNote, INoteResponse, NoteResponseSchema } from "@/schemas/note";
+import {
+	ICreateNote,
+	INoteResponse,
+	INotesResponse,
+	NoteResponseSchema,
+	NotesResponseSchema,
+} from "@/schemas/note";
 import { StatusCodes } from "http-status-codes";
 import { ImageKitService } from "../imageKit/imagekitService";
+import { defaultSuccessMessage, serverErrorMessage } from "@/common/constants/messages";
 
 class NoteService {
 	private noteRepository: NoteRepository;
@@ -27,11 +34,21 @@ class NoteService {
 			const validatedNote = NoteResponseSchema.parse(note);
 			return ServiceResponse.success<INoteResponse>("Note created successfully", validatedNote);
 		} catch (error) {
-			return ServiceResponse.failure(
-				"An error occurred while creating note",
-				null,
-				StatusCodes.INTERNAL_SERVER_ERROR,
-			);
+			return ServiceResponse.failure(serverErrorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	public async getUserNotes(
+		userId: string,
+		searchText?: string,
+		page: number = 1,
+	): Promise<ServiceResponse<INotesResponse | null>> {
+		try {
+			const notes = await this.noteRepository.getUserNotes(userId, searchText, page);
+			const validatedNotes = NotesResponseSchema.parse(notes);
+			return ServiceResponse.success<INotesResponse>(defaultSuccessMessage, validatedNotes);
+		} catch (error) {
+			return ServiceResponse.failure(serverErrorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

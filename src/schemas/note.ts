@@ -19,7 +19,10 @@ export const NoteSchema = z.object({
 export const NoteResponseSchema = NoteSchema.extend({
 	id: z.string(),
 	authorId: z.string().min(1, "Author ID is required"),
-	attachments: z.array(AttachmentSchema).max(5, "Maximum 5 attachments allowed").default([]),
+	attachments: z
+		.array(AttachmentSchema)
+		.max(5, "Maximum of 5 files allowed per upload")
+		.default([]),
 	isPinned: z.boolean().default(false),
 	createdAt: z.coerce.date(),
 	updatedAt: z.coerce.date(),
@@ -31,7 +34,25 @@ export const CreateNoteSchema = z.object({
 	}),
 });
 
+export const NotesResponseSchema = z.object({
+	notes: z.array(NoteResponseSchema),
+	totalElements: z.number(),
+	totalPages: z.number(),
+	currentPage: z.number(),
+});
+
+export const NotesQuerySchema = z.object({
+	query: z.object({
+		searchText: z.string().trim().optional(),
+		page: z
+			.string()
+			.optional()
+			.transform((val) => Number(val || "1")),
+	}),
+});
+
 export type IAttachment = z.infer<typeof AttachmentSchema>;
 export type INote = z.infer<typeof NoteSchema>;
 export type INoteResponse = z.infer<typeof NoteResponseSchema>;
 export type ICreateNote = z.infer<typeof CreateNoteSchema>["body"];
+export type INotesResponse = z.infer<typeof NotesResponseSchema>;

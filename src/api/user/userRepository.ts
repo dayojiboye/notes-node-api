@@ -30,6 +30,6 @@ export class UserRepository {
 		}
 
 		const user = await User.findByPk(userId);
-		return user;
+		return user ? user.toJSON() : null;
 	}
 }
