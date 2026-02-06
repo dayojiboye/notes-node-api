@@ -1,5 +1,5 @@
 import { ISignup } from "@/schemas/auth";
-import { IUpdatePasswordBody, IUpdatePasswordParams, IUser } from "@/schemas/user";
+import { IUpdatePasswordBody, IUser } from "@/schemas/user";
 import User from "./userModel";
 
 export class UserRepository {
@@ -14,10 +14,7 @@ export class UserRepository {
 		return user ? user.toJSON() : null;
 	}
 
-	public async updatePassword(
-		userId: IUpdatePasswordParams["userId"],
-		payload: IUpdatePasswordBody,
-	): Promise<IUser | null> {
+	public async updatePassword(userId: string, payload: IUpdatePasswordBody): Promise<IUser | null> {
 		const [affectedRows] = await User.update(
 			{
 				password: payload.newPassword,

@@ -1,11 +1,11 @@
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { UserRepository } from "./userRepository";
-import { IUpdatePasswordBody, IUpdatePasswordParams, IUser, UserSchema } from "@/schemas/user";
+import { IUpdatePasswordBody, IUser } from "@/schemas/user";
 import { ISignup } from "@/schemas/auth";
 import { StatusCodes } from "http-status-codes";
 import bcrypt from "bcrypt";
 import User from "./userModel";
-import { serverErrorMessage } from "@/common/constants/messages";
+import { forbiddenErrorMessage, serverErrorMessage } from "@/common/constants/messages";
 
 class UserService {
 	private userRepository: UserRepository;
@@ -23,15 +23,15 @@ class UserService {
 	}
 
 	public async updatePassword(
-		userId: IUpdatePasswordParams["userId"],
+		userId: string,
 		payload: IUpdatePasswordBody,
-	): Promise<ServiceResponse<IUser | null>> {
+	): Promise<ServiceResponse> {
 		try {
 			const { oldPassword, newPassword, confirmNewPassword, email } = payload;
 			const user = await User.scope("withPassword").findOne({ where: { id: userId, email } });
 
 			if (!user) {
-				return ServiceResponse.failure("User not found", null, StatusCodes.NOT_FOUND);
+				return ServiceResponse.failure(forbiddenErrorMessage, null, StatusCodes.FORBIDDEN);
 			}
 
 			if (oldPassword === newPassword) {
@@ -72,8 +72,7 @@ class UserService {
 				return ServiceResponse.failure("User not found", null, StatusCodes.NOT_FOUND);
 			}
 
-			const validatedUser = UserSchema.parse(updatedUser);
-			return ServiceResponse.success<IUser>("Password updated successfully", validatedUser);
+			return ServiceResponse.success("Password updated successfully", null);
 		} catch (error) {
 			return ServiceResponse.failure(serverErrorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}

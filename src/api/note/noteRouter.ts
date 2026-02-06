@@ -37,6 +37,7 @@ noteRegistry.registerPath({
 					}),
 				},
 			},
+			required: true,
 		},
 	},
 	responses: createApiResponse(NoteResponseSchema, "Success"),

@@ -1,4 +1,3 @@
-import { commonValidations } from "@/common/utils/commonValidation";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 
@@ -22,7 +21,6 @@ export const AuthResponseSchema = z.object({
 });
 
 export const UpdatePasswordSchema = z.object({
-	params: z.object({ userId: commonValidations.id }),
 	body: z
 		.object({
 			email: z.string().email("Enter a valid email address").trim(),
@@ -47,4 +45,3 @@ export const UpdatePasswordSchema = z.object({
 export type IUser = z.infer<typeof UserSchema>;
 export type IAuthResponse = z.infer<typeof AuthResponseSchema>;
 export type IUpdatePasswordBody = z.infer<typeof UpdatePasswordSchema>["body"];
-export type IUpdatePasswordParams = z.infer<typeof UpdatePasswordSchema>["params"];
