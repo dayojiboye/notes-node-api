@@ -3,6 +3,7 @@ import { validateRequest } from "@/common/utils/httpHandlers";
 import apiBaseUrl from "@/config/apiBaseUrl";
 import {
 	CreateNoteSchema,
+	GetNoteSchema,
 	NoteResponseSchema,
 	NotesQuerySchema,
 	NotesResponseSchema,
@@ -24,6 +25,7 @@ noteRegistry.registerPath({
 	method: "post",
 	path: `${apiBaseUrl}/note`,
 	tags: ["Note Service"],
+	summary: "Create note",
 	request: {
 		body: {
 			content: {
@@ -54,6 +56,7 @@ noteRegistry.registerPath({
 	method: "get",
 	path: `${apiBaseUrl}/note`,
 	tags: ["Note Service"],
+	summary: "Get user's notes",
 	request: {
 		query: NotesQuerySchema.shape.query.extend({
 			page: z.number().default(1),
@@ -62,4 +65,15 @@ noteRegistry.registerPath({
 	responses: createApiResponse(NotesResponseSchema, "Success"),
 });
 
-noteRouter.get("/", validateRequest(NotesQuerySchema), noteController.getUserNotes);
+noteRegistry.registerPath({
+	method: "get",
+	path: `${apiBaseUrl}/note/{noteId}`,
+	tags: ["Note Service"],
+	summary: "Get single note",
+	request: {
+		params: GetNoteSchema.shape.params,
+	},
+	responses: createApiResponse(NoteResponseSchema, "Success"),
+});
+
+noteRouter.get("/:noteId", validateRequest(GetNoteSchema), noteController.getNote);

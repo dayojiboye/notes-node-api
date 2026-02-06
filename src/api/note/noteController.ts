@@ -28,6 +28,11 @@ class NoteController {
 		);
 		return res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
+
+	public getNote: RequestHandler = async (req: Request, res: Response) => {
+		const serviceResponse = await noteService.getNote(req.params.noteId, res.locals.user.id);
+		return res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
 }
 
 export const noteController = new NoteController();

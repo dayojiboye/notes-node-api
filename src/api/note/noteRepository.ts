@@ -1,4 +1,11 @@
-import { IAttachment, ICreateNote, INote, INoteResponse, INotesResponse } from "@/schemas/note";
+import {
+	IAttachment,
+	ICreateNote,
+	IGetNote,
+	INote,
+	INoteResponse,
+	INotesResponse,
+} from "@/schemas/note";
 import Note from "./noteModel";
 import { Op, WhereOptions } from "sequelize";
 
@@ -47,5 +54,10 @@ export class NoteRepository {
 			totalPages: Math.ceil(count / limit),
 			currentPage: page,
 		};
+	}
+
+	public async getNote(noteId: IGetNote["noteId"], userId: string): Promise<INoteResponse | null> {
+		const note = await Note.findOne({ where: { id: noteId, authorId: userId } });
+		return note;
 	}
 }

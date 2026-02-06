@@ -16,6 +16,7 @@ authRegistry.registerPath({
 	method: "post",
 	path: `${apiBaseUrl}/auth/register`,
 	tags: ["Auth Service"],
+	summary: "Register user",
 	request: {
 		body: {
 			content: {
@@ -35,6 +36,7 @@ authRegistry.registerPath({
 	method: "post",
 	path: `${apiBaseUrl}/auth/login`,
 	tags: ["Auth Service"],
+	summary: "Login user",
 	request: {
 		body: {
 			content: {

@@ -16,6 +16,7 @@ userRegistry.registerPath({
 	method: "patch",
 	path: `${apiBaseUrl}/user/update-password`,
 	tags: ["User Service"],
+	summary: "Update user's password",
 	request: {
 		body: {
 			content: {
