@@ -65,6 +65,8 @@ noteRegistry.registerPath({
 	responses: createApiResponse(NotesResponseSchema, "Success"),
 });
 
+noteRouter.get("/", validateRequest(NotesQuerySchema), noteController.getUserNotes);
+
 noteRegistry.registerPath({
 	method: "get",
 	path: `${apiBaseUrl}/note/{noteId}`,
