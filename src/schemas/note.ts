@@ -15,21 +15,19 @@ export const NoteSchema = z.object({
 		.optional()
 		.transform((val) => val === "true")
 		.default("false"),
+	attachments: z.array(AttachmentSchema).max(5, "Maximum of 5 files allowed per upload").optional(),
 });
 
 export const NoteResponseSchema = NoteSchema.extend({
 	id: z.string(),
 	authorId: z.string().min(1, "Author ID is required"),
-	attachments: z.array(AttachmentSchema).max(5, "Maximum of 5 files allowed per upload"),
 	isPinned: z.boolean().default(false),
 	createdAt: z.coerce.date(),
 	updatedAt: z.coerce.date(),
 });
 
 export const CreateNoteSchema = z.object({
-	body: NoteSchema.extend({
-		authorId: z.string().min(1, "Author ID is required"),
-	}),
+	body: NoteSchema,
 });
 
 export const NotesResponseSchema = z.object({

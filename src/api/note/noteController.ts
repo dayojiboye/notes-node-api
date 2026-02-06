@@ -2,21 +2,29 @@ import { Request, RequestHandler, Response } from "express";
 import { noteService } from "./noteService";
 import { ICreateNote } from "@/schemas/note";
 import DOMPurify from "isomorphic-dompurify";
+import { ImageKitService } from "../imageKit/imageKitService";
 
 class NoteController {
 	public createNote: RequestHandler = async (req: Request, res: Response) => {
 		const content = req.body.content;
 		const cleanContent = DOMPurify.sanitize(content);
 
-		const notePayload: ICreateNote = {
-			...req.body,
-			authorId: res.locals.user.id,
-			content: cleanContent,
-		};
-
 		const attachments = req.files as Express.Multer.File[];
 
-		const serviceResponse = await noteService.createNote(notePayload, attachments);
+		const uploadedAttachments =
+			attachments.length > 0
+				? await Promise.all(
+						attachments.map((attachment) => ImageKitService.uploadToImageKit(attachment)),
+					)
+				: [];
+
+		const notePayload: ICreateNote = {
+			...req.body,
+			content: cleanContent,
+			attachments: uploadedAttachments,
+		};
+
+		const serviceResponse = await noteService.createNote(res.locals.user.id, notePayload);
 		return res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 

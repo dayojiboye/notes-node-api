@@ -13,7 +13,7 @@ class Note extends Model<
 > {
 	declare id: CreationOptional<string>;
 	declare content: string;
-	declare attachments: { fileId: string; url: string; name: string }[];
+	declare attachments?: { fileId: string; url: string; name: string }[];
 	declare isPinned: boolean;
 	declare authorId: string;
 	declare categoryId?: string | null;

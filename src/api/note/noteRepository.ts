@@ -1,24 +1,13 @@
-import {
-	IAttachment,
-	ICreateNote,
-	IGetNote,
-	INote,
-	INoteResponse,
-	INotesResponse,
-} from "@/schemas/note";
+import { ICreateNote, IGetNote, INoteResponse, INotesResponse } from "@/schemas/note";
 import Note from "./noteModel";
 import { Op, WhereOptions } from "sequelize";
 
 export class NoteRepository {
-	public async createNote(
-		payload: ICreateNote,
-		attachments: IAttachment[],
-	): Promise<INoteResponse> {
+	public async createNote(userId: string, payload: ICreateNote): Promise<INoteResponse> {
 		const newNote = await Note.create({
 			...payload,
-			attachments,
+			authorId: userId,
 		});
-
 		return newNote;
 	}
 

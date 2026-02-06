@@ -9,7 +9,6 @@ import {
 	NotesResponseSchema,
 } from "@/schemas/note";
 import { StatusCodes } from "http-status-codes";
-import { ImageKitService } from "../imageKit/imagekitService";
 import {
 	defaultSuccessMessage,
 	noteNotFoundMessage,
@@ -24,18 +23,11 @@ class NoteService {
 	}
 
 	public async createNote(
+		userId: string,
 		payload: ICreateNote,
-		attachments: Express.Multer.File[],
 	): Promise<ServiceResponse<INoteResponse | null>> {
 		try {
-			const uploadedAttachments =
-				attachments.length > 0
-					? await Promise.all(
-							attachments.map((attachment) => ImageKitService.uploadToImageKit(attachment)),
-						)
-					: [];
-
-			const note = await this.noteRepository.createNote(payload, uploadedAttachments);
+			const note = await this.noteRepository.createNote(userId, payload);
 			const validatedNote = NoteResponseSchema.parse(note);
 			return ServiceResponse.success<INoteResponse>("Note created successfully", validatedNote);
 		} catch (error) {
