@@ -24,6 +24,7 @@ export const NoteResponseSchema = NoteSchema.extend({
 	isPinned: z.boolean().default(false),
 	createdAt: z.coerce.date(),
 	updatedAt: z.coerce.date(),
+	attachments: z.array(AttachmentSchema).optional(),
 });
 
 export const CreateNoteSchema = z.object({
@@ -51,9 +52,15 @@ export const GetNoteSchema = z.object({
 	params: z.object({ noteId: commonValidations.id }),
 });
 
+export const UpdateNoteSchema = z.object({
+	params: z.object({ noteId: commonValidations.id }),
+	body: NoteSchema.partial(),
+});
+
 export type IAttachment = z.infer<typeof AttachmentSchema>;
 export type INote = z.infer<typeof NoteSchema>;
 export type INoteResponse = z.infer<typeof NoteResponseSchema>;
 export type ICreateNote = z.infer<typeof CreateNoteSchema>["body"];
 export type INotesResponse = z.infer<typeof NotesResponseSchema>;
 export type IGetNote = z.infer<typeof GetNoteSchema>["params"];
+export type IUpdateNote = z.infer<typeof UpdateNoteSchema>["body"];

@@ -1,4 +1,4 @@
-import { ICreateNote, IGetNote, INoteResponse, INotesResponse } from "@/schemas/note";
+import { ICreateNote, IGetNote, INoteResponse, INotesResponse, IUpdateNote } from "@/schemas/note";
 import Note from "./noteModel";
 import { Op, WhereOptions } from "sequelize";
 
@@ -48,5 +48,36 @@ export class NoteRepository {
 	public async getNote(noteId: IGetNote["noteId"], userId: string): Promise<INoteResponse | null> {
 		const note = await Note.findOne({ where: { id: noteId, authorId: userId } });
 		return note;
+	}
+
+	public async updateNote(
+		noteId: IGetNote["noteId"],
+		userId: string,
+		payload: IUpdateNote,
+	): Promise<INoteResponse | null> {
+		const note = await this.getNote(noteId, userId);
+
+		if (!note) {
+			return null;
+		}
+
+		const updateNotePayload: IUpdateNote = {
+			...payload,
+			content: payload.content || note.content,
+			attachments: note.attachments
+				? [...(payload.attachments || []), ...note.attachments]
+				: payload.attachments,
+		};
+
+		const [affectedRows] = await Note.update(updateNotePayload, {
+			where: { id: noteId, authorId: userId },
+		});
+
+		if (affectedRows === 0) {
+			return null;
+		}
+
+		const updatedNote = await this.getNote(noteId, userId);
+		return updatedNote;
 	}
 }

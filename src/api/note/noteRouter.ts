@@ -7,6 +7,7 @@ import {
 	NoteResponseSchema,
 	NotesQuerySchema,
 	NotesResponseSchema,
+	UpdateNoteSchema,
 } from "@/schemas/note";
 import { extendZodWithOpenApi, OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import express, { Router } from "express";
@@ -79,3 +80,35 @@ noteRegistry.registerPath({
 });
 
 noteRouter.get("/:noteId", validateRequest(GetNoteSchema), noteController.getNote);
+
+noteRegistry.registerPath({
+	method: "patch",
+	path: `${apiBaseUrl}/note/{noteId}`,
+	tags: ["Note Service"],
+	summary: "Update note",
+	request: {
+		params: UpdateNoteSchema.shape.params,
+		body: {
+			content: {
+				"multipart/form-data": {
+					schema: UpdateNoteSchema.shape.body.extend({
+						isPinned: z.boolean().default(false),
+						attachments: z.any().optional().openapi({
+							type: "array",
+							maxItems: 5,
+						}),
+					}),
+				},
+			},
+			required: true,
+		},
+	},
+	responses: createApiResponse(NoteResponseSchema, "Success"),
+});
+
+noteRouter.patch(
+	"/:noteId",
+	upload.array("attachments", 5),
+	validateRequest(UpdateNoteSchema),
+	noteController.updateNote,
+);

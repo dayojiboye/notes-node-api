@@ -5,6 +5,7 @@ import {
 	IGetNote,
 	INoteResponse,
 	INotesResponse,
+	IUpdateNote,
 	NoteResponseSchema,
 	NotesResponseSchema,
 } from "@/schemas/note";
@@ -62,6 +63,25 @@ class NoteService {
 
 			const validatedNote = NoteResponseSchema.parse(note);
 			return ServiceResponse.success<INoteResponse>(defaultSuccessMessage, validatedNote);
+		} catch (error) {
+			return ServiceResponse.failure(serverErrorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	public async updateNote(
+		noteId: IGetNote["noteId"],
+		userId: string,
+		payload: IUpdateNote,
+	): Promise<ServiceResponse<INoteResponse | null>> {
+		try {
+			const note = await this.noteRepository.updateNote(noteId, userId, payload);
+
+			if (!note) {
+				return ServiceResponse.failure(noteNotFoundMessage, null, StatusCodes.NOT_FOUND);
+			}
+
+			const validatedNote = NoteResponseSchema.parse(note);
+			return ServiceResponse.success<INoteResponse>("Note updated successfully", validatedNote);
 		} catch (error) {
 			return ServiceResponse.failure(serverErrorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}

@@ -1,6 +1,6 @@
 import { Request, RequestHandler, Response } from "express";
 import { noteService } from "./noteService";
-import { ICreateNote } from "@/schemas/note";
+import { ICreateNote, IUpdateNote } from "@/schemas/note";
 import DOMPurify from "isomorphic-dompurify";
 import { ImageKitService } from "../imageKit/imageKitService";
 
@@ -39,6 +39,31 @@ class NoteController {
 
 	public getNote: RequestHandler = async (req: Request, res: Response) => {
 		const serviceResponse = await noteService.getNote(req.params.noteId, res.locals.user.id);
+		return res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
+
+	public updateNote: RequestHandler = async (req: Request, res: Response) => {
+		const content = req.body.content;
+		const attachments = req.files as Express.Multer.File[];
+
+		const uploadedAttachments =
+			attachments.length > 0
+				? await Promise.all(
+						attachments.map((attachment) => ImageKitService.uploadToImageKit(attachment)),
+					)
+				: [];
+
+		const updateNotePayload: IUpdateNote = {
+			...req.body,
+			content: content ? DOMPurify.sanitize(content) : undefined,
+			attachments: uploadedAttachments,
+		};
+
+		const serviceResponse = await noteService.updateNote(
+			req.params.noteId,
+			res.locals.user.id,
+			updateNotePayload,
+		);
 		return res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
 }
