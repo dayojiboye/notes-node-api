@@ -2,6 +2,7 @@ import { ServiceResponse } from "@/common/models/serviceResponse";
 import { NoteRepository } from "./noteRepository";
 import {
 	ICreateNote,
+	IDeleteAttachment,
 	IGetNote,
 	INoteResponse,
 	INotesResponse,
@@ -84,6 +85,29 @@ class NoteService {
 			return ServiceResponse.success<INoteResponse>("Note updated successfully", validatedNote);
 		} catch (error) {
 			return ServiceResponse.failure(serverErrorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	public async deleteAttachment(
+		noteId: IDeleteAttachment["noteId"],
+		userId: string,
+		attachmentId: IDeleteAttachment["attachmentId"],
+	): Promise<ServiceResponse<INoteResponse | null>> {
+		try {
+			const note = await this.noteRepository.deleteAttachment(noteId, userId, attachmentId);
+
+			if (!note) {
+				return ServiceResponse.failure(noteNotFoundMessage, null, StatusCodes.NOT_FOUND);
+			}
+
+			const validatedNote = NoteResponseSchema.parse(note);
+			return ServiceResponse.success<INoteResponse>(defaultSuccessMessage, validatedNote);
+		} catch (error) {
+			return ServiceResponse.failure(
+				error instanceof Error ? error.message : serverErrorMessage,
+				null,
+				StatusCodes.INTERNAL_SERVER_ERROR,
+			);
 		}
 	}
 }

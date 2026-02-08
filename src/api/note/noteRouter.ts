@@ -3,6 +3,7 @@ import { validateRequest } from "@/common/utils/httpHandlers";
 import apiBaseUrl from "@/config/apiBaseUrl";
 import {
 	CreateNoteSchema,
+	DeleteAttachmentSchema,
 	GetNoteSchema,
 	NoteResponseSchema,
 	NotesQuerySchema,
@@ -111,4 +112,21 @@ noteRouter.patch(
 	upload.array("attachments", 5),
 	validateRequest(UpdateNoteSchema),
 	noteController.updateNote,
+);
+
+noteRegistry.registerPath({
+	method: "delete",
+	path: `${apiBaseUrl}/note/{noteId}/attachment/{attachmentId}`,
+	tags: ["Note Service"],
+	summary: "Delete attachment",
+	request: {
+		params: DeleteAttachmentSchema.shape.params,
+	},
+	responses: createApiResponse(NoteResponseSchema, "Success"),
+});
+
+noteRouter.delete(
+	"/:noteId/attachment/:attachmentId",
+	validateRequest(DeleteAttachmentSchema),
+	noteController.deleteAttachment,
 );

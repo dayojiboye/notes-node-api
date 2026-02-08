@@ -59,6 +59,15 @@ class NoteController {
 		);
 		return res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
+
+	public deleteAttachment: RequestHandler = async (req: Request, res: Response) => {
+		const serviceResponse = await noteService.deleteAttachment(
+			req.params.noteId,
+			res.locals.user.id,
+			req.params.attachmentId,
+		);
+		return res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
 }
 
 export const noteController = new NoteController();

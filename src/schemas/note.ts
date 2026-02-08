@@ -57,6 +57,10 @@ export const UpdateNoteSchema = z.object({
 	body: NoteSchema.partial(),
 });
 
+export const DeleteAttachmentSchema = z.object({
+	params: z.object({ noteId: commonValidations.id, attachmentId: commonValidations.id }),
+});
+
 export type IAttachment = z.infer<typeof AttachmentSchema>;
 export type INote = z.infer<typeof NoteSchema>;
 export type INoteResponse = z.infer<typeof NoteResponseSchema>;
@@ -64,3 +68,4 @@ export type ICreateNote = z.infer<typeof CreateNoteSchema>["body"];
 export type INotesResponse = z.infer<typeof NotesResponseSchema>;
 export type IGetNote = z.infer<typeof GetNoteSchema>["params"];
 export type IUpdateNote = z.infer<typeof UpdateNoteSchema>["body"];
+export type IDeleteAttachment = z.infer<typeof DeleteAttachmentSchema>["params"];

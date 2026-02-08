@@ -1,7 +1,16 @@
-import { ICreateNote, IGetNote, INoteResponse, INotesResponse, IUpdateNote } from "@/schemas/note";
+import {
+	ICreateNote,
+	IDeleteAttachment,
+	IGetNote,
+	INoteResponse,
+	INotesResponse,
+	IUpdateNote,
+} from "@/schemas/note";
 import Note from "./noteModel";
 import { Op, WhereOptions } from "sequelize";
 import DOMPurify from "isomorphic-dompurify";
+import { ImageKitService } from "../imageKit/imageKitService";
+import { isAttachmentFoundInNote } from "@/common/utils/helpers";
 
 export class NoteRepository {
 	public async createNote(userId: string, payload: ICreateNote): Promise<INoteResponse> {
@@ -81,6 +90,40 @@ export class NoteRepository {
 		if (affectedRows === 0) {
 			return null;
 		}
+
+		const updatedNote = await this.getNote(noteId, userId);
+		return updatedNote;
+	}
+
+	public async deleteAttachment(
+		noteId: IDeleteAttachment["noteId"],
+		userId: string,
+		attachmentId: IDeleteAttachment["attachmentId"],
+	): Promise<INoteResponse | null> {
+		const note = await this.getNote(noteId, userId);
+
+		if (!note) return null;
+
+		const attachmentExistsInNote = isAttachmentFoundInNote(note, attachmentId);
+
+		if (!attachmentExistsInNote) {
+			throw new Error("Attachment not found in note");
+		}
+
+		await ImageKitService.deleteFromImageKit(attachmentId);
+
+		const updatedAttachments = note.attachments?.filter(
+			(attachment) => attachment.fileId !== attachmentId,
+		);
+
+		const [affectedRows] = await Note.update(
+			{ attachments: updatedAttachments },
+			{
+				where: { id: noteId, authorId: userId },
+			},
+		);
+
+		if (affectedRows === 0) return null;
 
 		const updatedNote = await this.getNote(noteId, userId);
 		return updatedNote;
