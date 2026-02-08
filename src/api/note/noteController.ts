@@ -1,14 +1,10 @@
 import { Request, RequestHandler, Response } from "express";
 import { noteService } from "./noteService";
 import { ICreateNote, IUpdateNote } from "@/schemas/note";
-import DOMPurify from "isomorphic-dompurify";
 import { ImageKitService } from "../imageKit/imageKitService";
 
 class NoteController {
 	public createNote: RequestHandler = async (req: Request, res: Response) => {
-		const content = req.body.content;
-		const cleanContent = DOMPurify.sanitize(content);
-
 		const attachments = req.files as Express.Multer.File[];
 
 		const uploadedAttachments =
@@ -20,7 +16,6 @@ class NoteController {
 
 		const notePayload: ICreateNote = {
 			...req.body,
-			content: cleanContent,
 			attachments: uploadedAttachments,
 		};
 
@@ -43,7 +38,6 @@ class NoteController {
 	};
 
 	public updateNote: RequestHandler = async (req: Request, res: Response) => {
-		const content = req.body.content;
 		const attachments = req.files as Express.Multer.File[];
 
 		const uploadedAttachments =
@@ -55,7 +49,6 @@ class NoteController {
 
 		const updateNotePayload: IUpdateNote = {
 			...req.body,
-			content: content ? DOMPurify.sanitize(content) : undefined,
 			attachments: uploadedAttachments,
 		};
 

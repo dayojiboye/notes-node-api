@@ -1,11 +1,13 @@
 import { ICreateNote, IGetNote, INoteResponse, INotesResponse, IUpdateNote } from "@/schemas/note";
 import Note from "./noteModel";
 import { Op, WhereOptions } from "sequelize";
+import DOMPurify from "isomorphic-dompurify";
 
 export class NoteRepository {
 	public async createNote(userId: string, payload: ICreateNote): Promise<INoteResponse> {
 		const newNote = await Note.create({
 			...payload,
+			content: DOMPurify.sanitize(payload.content),
 			authorId: userId,
 		});
 		return newNote;
@@ -63,11 +65,14 @@ export class NoteRepository {
 
 		const updateNotePayload: IUpdateNote = {
 			...payload,
-			content: payload.content || note.content,
 			attachments: note.attachments
 				? [...(payload.attachments || []), ...note.attachments]
 				: payload.attachments,
 		};
+
+		if (payload.content) {
+			updateNotePayload.content = DOMPurify.sanitize(payload.content);
+		}
 
 		const [affectedRows] = await Note.update(updateNotePayload, {
 			where: { id: noteId, authorId: userId },
