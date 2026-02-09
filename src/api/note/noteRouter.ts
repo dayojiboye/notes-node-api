@@ -130,3 +130,16 @@ noteRouter.delete(
 	validateRequest(DeleteAttachmentSchema),
 	noteController.deleteAttachment,
 );
+
+noteRegistry.registerPath({
+	method: "delete",
+	path: `${apiBaseUrl}/note/{noteId}`,
+	tags: ["Note Service"],
+	summary: "Delete note",
+	request: {
+		params: GetNoteSchema.shape.params,
+	},
+	responses: createApiResponse(z.null(), "Success"),
+});
+
+noteRouter.delete("/:noteId", validateRequest(GetNoteSchema), noteController.deleteNote);

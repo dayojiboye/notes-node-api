@@ -68,6 +68,11 @@ class NoteController {
 		);
 		return res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
+
+	public deleteNote: RequestHandler = async (req: Request, res: Response) => {
+		const serviceResponse = await noteService.deleteNote(req.params.noteId, res.locals.user.id);
+		return res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
 }
 
 export const noteController = new NoteController();

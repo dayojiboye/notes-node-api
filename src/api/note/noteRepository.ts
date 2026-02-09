@@ -128,4 +128,29 @@ export class NoteRepository {
 		const updatedNote = await this.getNote(noteId, userId);
 		return updatedNote;
 	}
+
+	public async deleteNote(noteId: IGetNote["noteId"], userId: string): Promise<boolean> {
+		const note = await this.getNote(noteId, userId);
+
+		if (!note) {
+			return false;
+		}
+
+		const deletedRows = await Note.destroy({ where: { id: noteId, authorId: userId } });
+
+		if (deletedRows === 0) {
+			return false;
+		}
+
+		if (note.attachments && note.attachments.length > 0) {
+			const attachmentIds = note.attachments.map((attachment) => attachment.fileId);
+
+			ImageKitService.deleteMultipleFiles(attachmentIds).catch((error) => {
+				console.error("ImageKit deletion failed, queuing for retry: ", error);
+				// Might add to a cleanup queue in case this fails
+			});
+		}
+
+		return true;
+	}
 }

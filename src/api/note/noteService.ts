@@ -33,7 +33,11 @@ class NoteService {
 			const validatedNote = NoteResponseSchema.parse(note);
 			return ServiceResponse.success<INoteResponse>("Note created successfully", validatedNote);
 		} catch (error) {
-			return ServiceResponse.failure(serverErrorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
+			return ServiceResponse.failure(
+				error instanceof Error ? error.message : serverErrorMessage,
+				null,
+				StatusCodes.INTERNAL_SERVER_ERROR,
+			);
 		}
 	}
 
@@ -102,6 +106,27 @@ class NoteService {
 
 			const validatedNote = NoteResponseSchema.parse(note);
 			return ServiceResponse.success<INoteResponse>(defaultSuccessMessage, validatedNote);
+		} catch (error) {
+			return ServiceResponse.failure(
+				error instanceof Error ? error.message : serverErrorMessage,
+				null,
+				StatusCodes.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	public async deleteNote(
+		noteId: IGetNote["noteId"],
+		userId: string,
+	): Promise<ServiceResponse<null>> {
+		try {
+			const isDeleted = await this.noteRepository.deleteNote(noteId, userId);
+
+			if (!isDeleted) {
+				return ServiceResponse.failure(noteNotFoundMessage, null, StatusCodes.NOT_FOUND);
+			}
+
+			return ServiceResponse.success(defaultSuccessMessage, null);
 		} catch (error) {
 			return ServiceResponse.failure(
 				error instanceof Error ? error.message : serverErrorMessage,
