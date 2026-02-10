@@ -6,6 +6,7 @@ import {
 	InferCreationAttributes,
 	Model,
 } from "sequelize";
+import Note from "../note/noteModel";
 
 class Category extends Model<
 	InferAttributes<Category, { omit: "createdAt" | "updatedAt" }>,
@@ -15,6 +16,7 @@ class Category extends Model<
 	declare title: string;
 	declare emoji?: string;
 	declare categoryAuthorId: string;
+	declare notesCount?: number;
 	declare createdAt: CreationOptional<Date>;
 	declare updatedAt: CreationOptional<Date>;
 }
@@ -45,6 +47,23 @@ Category.init(
 	{
 		sequelize,
 		timestamps: true,
+		hooks: {
+			afterFind: async (findResult: any) => {
+				if (!findResult) return;
+
+				const instances = Array.isArray(findResult) ? findResult : [findResult];
+
+				for (const instance of instances) {
+					if (instance instanceof Category) {
+						const count = await Note.count({
+							where: { categoryId: instance.id },
+						});
+
+						instance.notesCount = count;
+					}
+				}
+			},
+		},
 	},
 );
 

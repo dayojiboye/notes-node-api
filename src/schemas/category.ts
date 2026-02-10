@@ -1,3 +1,4 @@
+import { commonValidations } from "@/common/utils/commonValidation";
 import { z } from "zod";
 
 export const CategorySchema = z.object({
@@ -15,10 +16,18 @@ export const CreateCategorySchema = z.object({
 });
 
 export const CategoryResponseSchema = CreateCategoryResponseSchema.extend({
-	notesCount: z.number(),
+	notesCount: z.number().optional(),
+});
+
+export const CategoriesResponseSchema = z.array(CategoryResponseSchema);
+
+export const GetCategorySchema = z.object({
+	params: z.object({ categoryId: commonValidations.id }),
 });
 
 export type ICategory = z.infer<typeof CategorySchema>;
 export type ICreateCategoryResponse = z.infer<typeof CreateCategoryResponseSchema>;
 export type ICreateCategory = z.infer<typeof CreateCategorySchema>["body"];
 export type ICategoryResponse = z.infer<typeof CategoryResponseSchema>;
+export type ICategoriesResponse = z.infer<typeof CategoriesResponseSchema>;
+export type IGetCategory = z.infer<typeof GetCategorySchema>["params"];

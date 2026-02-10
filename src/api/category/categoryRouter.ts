@@ -5,6 +5,7 @@ import {
 	CreateCategoryResponseSchema,
 	CreateCategorySchema,
 	CategoryResponseSchema,
+	CategoriesResponseSchema,
 } from "@/schemas/category";
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import express, { Router } from "express";
@@ -34,3 +35,13 @@ categoryRegistry.registerPath({
 });
 
 categoryRouter.post("/", validateRequest(CreateCategorySchema), categoryController.createCategory);
+
+categoryRegistry.registerPath({
+	method: "get",
+	path: `${apiBaseUrl}/category`,
+	tags: ["Category Service"],
+	summary: "Get user's categories",
+	responses: createApiResponse(CategoriesResponseSchema, "Success"),
+});
+
+categoryRouter.get("/", categoryController.getAllCategories);

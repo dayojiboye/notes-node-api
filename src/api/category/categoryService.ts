@@ -2,10 +2,12 @@ import {
 	CreateCategoryResponseSchema,
 	ICreateCategoryResponse,
 	ICreateCategory,
+	ICategoriesResponse,
+	CategoriesResponseSchema,
 } from "@/schemas/category";
 import { CategoryRepository } from "./categoryRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
-import { serverErrorMessage } from "@/common/constants/messages";
+import { defaultSuccessMessage, serverErrorMessage } from "@/common/constants/messages";
 import { StatusCodes } from "http-status-codes";
 
 class CategoryService {
@@ -32,6 +34,25 @@ class CategoryService {
 			return ServiceResponse.success<ICreateCategoryResponse>(
 				"Category created successfully",
 				validatedCategory,
+			);
+		} catch (error) {
+			return ServiceResponse.failure(
+				error instanceof Error ? error.message : serverErrorMessage,
+				null,
+				StatusCodes.INTERNAL_SERVER_ERROR,
+			);
+		}
+	}
+
+	public async getAllCategories(
+		userId: string,
+	): Promise<ServiceResponse<ICategoriesResponse | null>> {
+		try {
+			const categories = await this.categoryRepository.getAllCategories(userId);
+			const validatedCategories = CategoriesResponseSchema.parse(categories);
+			return ServiceResponse.success<ICategoriesResponse>(
+				defaultSuccessMessage,
+				validatedCategories,
 			);
 		} catch (error) {
 			return ServiceResponse.failure(
