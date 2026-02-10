@@ -6,6 +6,7 @@ import {
 	IGetNote,
 	INoteResponse,
 	INotesResponse,
+	IRemoveNoteFromCategory,
 	IUpdateNote,
 	NoteResponseSchema,
 	NotesResponseSchema,
@@ -133,6 +134,28 @@ class NoteService {
 				null,
 				StatusCodes.INTERNAL_SERVER_ERROR,
 			);
+		}
+	}
+
+	public async removeNoteFromCategory(
+		noteId: IRemoveNoteFromCategory["noteId"],
+		categoryId: IRemoveNoteFromCategory["categoryId"],
+		userId: string,
+	): Promise<ServiceResponse<boolean | null>> {
+		try {
+			const isRemoved = await this.noteRepository.removeNoteFromCategory(
+				noteId,
+				categoryId,
+				userId,
+			);
+
+			if (!isRemoved) {
+				return ServiceResponse.failure(noteNotFoundMessage, false, StatusCodes.NOT_FOUND);
+			}
+
+			return ServiceResponse.success(defaultSuccessMessage, true);
+		} catch (error) {
+			return ServiceResponse.failure(serverErrorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

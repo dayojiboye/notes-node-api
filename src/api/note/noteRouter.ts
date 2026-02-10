@@ -8,6 +8,7 @@ import {
 	NoteResponseSchema,
 	NotesQuerySchema,
 	NotesResponseSchema,
+	RemoveNoteFromCategorySchema,
 	UpdateNoteSchema,
 } from "@/schemas/note";
 import { extendZodWithOpenApi, OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
@@ -143,3 +144,20 @@ noteRegistry.registerPath({
 });
 
 noteRouter.delete("/:noteId", validateRequest(GetNoteSchema), noteController.deleteNote);
+
+noteRegistry.registerPath({
+	method: "delete",
+	path: `${apiBaseUrl}/note/{noteId}/category/{categoryId}`,
+	tags: ["Note Service"],
+	summary: "Remove note from category",
+	request: {
+		params: RemoveNoteFromCategorySchema.shape.params,
+	},
+	responses: createApiResponse(z.boolean(), "Success"),
+});
+
+noteRouter.delete(
+	"/:noteId/category/:categoryId",
+	validateRequest(RemoveNoteFromCategorySchema),
+	noteController.removeNoteFromCategory,
+);

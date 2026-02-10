@@ -4,6 +4,7 @@ import {
 	IGetNote,
 	INoteResponse,
 	INotesResponse,
+	IRemoveNoteFromCategory,
 	IUpdateNote,
 } from "@/schemas/note";
 import Note from "./noteModel";
@@ -151,6 +152,26 @@ export class NoteRepository {
 			});
 		}
 
+		return true;
+	}
+
+	public async removeNoteFromCategory(
+		noteId: IRemoveNoteFromCategory["noteId"],
+		categoryId: IRemoveNoteFromCategory["categoryId"],
+		userId: string,
+	): Promise<boolean> {
+		const note = this.getNote(noteId, userId);
+
+		if (!note) return false;
+
+		const [affectedRows] = await Note.update(
+			{ categoryId: null },
+			{
+				where: { id: noteId, authorId: userId, categoryId },
+			},
+		);
+
+		if (affectedRows === 0) return false;
 		return true;
 	}
 }

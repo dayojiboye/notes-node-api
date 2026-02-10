@@ -73,6 +73,15 @@ class NoteController {
 		const serviceResponse = await noteService.deleteNote(req.params.noteId, res.locals.user.id);
 		return res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
+
+	public removeNoteFromCategory: RequestHandler = async (req: Request, res: Response) => {
+		const serviceResponse = await noteService.removeNoteFromCategory(
+			req.params.noteId,
+			req.params.categoryId,
+			res.locals.user.id,
+		);
+		return res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
 }
 
 export const noteController = new NoteController();
