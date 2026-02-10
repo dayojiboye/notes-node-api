@@ -13,7 +13,7 @@ class Category extends Model<
 > {
 	declare id: CreationOptional<string>;
 	declare title: string;
-	declare emoji: string;
+	declare emoji?: string;
 	declare categoryAuthorId: string;
 	declare createdAt: CreationOptional<Date>;
 	declare updatedAt: CreationOptional<Date>;
@@ -35,6 +35,7 @@ Category.init(
 		emoji: {
 			type: DataTypes.STRING,
 			allowNull: false,
+			defaultValue: "",
 		},
 		categoryAuthorId: {
 			type: DataTypes.UUID,

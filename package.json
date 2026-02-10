@@ -10,6 +10,7 @@
 	"private": true,
 	"scripts": {
 		"build": "tsc && tsup",
+		"dev": "pnpm start:dev",
 		"start:dev": "tsx watch src/index.ts",
 		"start:prod": "node dist/index.js",
 		"test": "vitest run",
