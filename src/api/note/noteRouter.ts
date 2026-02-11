@@ -4,6 +4,7 @@ import apiBaseUrl from "@/config/apiBaseUrl";
 import {
 	CreateNoteSchema,
 	DeleteAttachmentSchema,
+	GetCategoryNotesSchema,
 	GetNoteSchema,
 	NoteResponseSchema,
 	NotesQuerySchema,
@@ -160,4 +161,24 @@ noteRouter.delete(
 	"/:noteId/category/:categoryId",
 	validateRequest(RemoveNoteFromCategorySchema),
 	noteController.removeNoteFromCategory,
+);
+
+noteRegistry.registerPath({
+	method: "get",
+	path: `${apiBaseUrl}/note/category/{categoryId}`,
+	tags: ["Note Service"],
+	summary: "Get all notes in a category",
+	request: {
+		params: GetCategoryNotesSchema.shape.params,
+		query: GetCategoryNotesSchema.shape.query.extend({
+			page: z.number().default(1),
+		}),
+	},
+	responses: createApiResponse(NotesResponseSchema, "Success"),
+});
+
+noteRouter.get(
+	"/category/:categoryId",
+	validateRequest(GetCategoryNotesSchema),
+	noteController.getAllNotesInCategory,
 );

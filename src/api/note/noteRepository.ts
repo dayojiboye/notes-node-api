@@ -1,6 +1,7 @@
 import {
 	ICreateNote,
 	IDeleteAttachment,
+	IGetCategoryNotesParams,
 	IGetNote,
 	INoteResponse,
 	INotesResponse,
@@ -173,5 +174,41 @@ export class NoteRepository {
 
 		if (affectedRows === 0) return false;
 		return true;
+	}
+
+	public async getAllNotesInCategory(
+		userId: string,
+		categoryId: IGetCategoryNotesParams["categoryId"],
+		searchText?: string,
+		page: number = 1,
+	): Promise<INotesResponse> {
+		const limit = 20;
+		const offset = (page - 1) * limit;
+
+		const whereClause: WhereOptions = {
+			authorId: userId,
+			categoryId,
+		};
+
+		if (searchText && searchText.trim()) {
+			whereClause.content = { [Op.like]: `%${searchText.trim()}%` };
+		}
+
+		const { count, rows } = await Note.findAndCountAll({
+			where: whereClause,
+			order: [
+				["isPinned", "DESC"],
+				["updatedAt", "DESC"],
+			],
+			limit,
+			offset,
+		});
+
+		return {
+			notes: rows.map((note) => note.toJSON()),
+			totalElements: count,
+			totalPages: Math.ceil(count / limit),
+			currentPage: page,
+		};
 	}
 }

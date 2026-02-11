@@ -65,6 +65,11 @@ export const RemoveNoteFromCategorySchema = z.object({
 	params: z.object({ noteId: commonValidations.id, categoryId: commonValidations.id }),
 });
 
+export const GetCategoryNotesSchema = z.object({
+	params: z.object({ categoryId: commonValidations.id }),
+	query: NotesQuerySchema.shape.query,
+});
+
 export type IAttachment = z.infer<typeof AttachmentSchema>;
 export type INote = z.infer<typeof NoteSchema>;
 export type INoteResponse = z.infer<typeof NoteResponseSchema>;
@@ -74,3 +79,4 @@ export type IGetNote = z.infer<typeof GetNoteSchema>["params"];
 export type IUpdateNote = z.infer<typeof UpdateNoteSchema>["body"];
 export type IDeleteAttachment = z.infer<typeof DeleteAttachmentSchema>["params"];
 export type IRemoveNoteFromCategory = z.infer<typeof RemoveNoteFromCategorySchema>["params"];
+export type IGetCategoryNotesParams = z.infer<typeof GetCategoryNotesSchema>["params"];

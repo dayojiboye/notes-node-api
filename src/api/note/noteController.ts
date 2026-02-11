@@ -82,6 +82,16 @@ class NoteController {
 		);
 		return res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
+
+	public getAllNotesInCategory: RequestHandler = async (req: Request, res: Response) => {
+		const serviceResponse = await noteService.getAllNotesInCategory(
+			res.locals.user.id,
+			req.params.categoryId,
+			req.query.searchText as string | undefined,
+			Number(req.query.page as string) || 1,
+		);
+		return res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
 }
 
 export const noteController = new NoteController();

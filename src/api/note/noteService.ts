@@ -3,6 +3,7 @@ import { NoteRepository } from "./noteRepository";
 import {
 	ICreateNote,
 	IDeleteAttachment,
+	IGetCategoryNotesParams,
 	IGetNote,
 	INoteResponse,
 	INotesResponse,
@@ -154,6 +155,26 @@ class NoteService {
 			}
 
 			return ServiceResponse.success(defaultSuccessMessage, true);
+		} catch (error) {
+			return ServiceResponse.failure(serverErrorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	public async getAllNotesInCategory(
+		userId: string,
+		categoryId: IGetCategoryNotesParams["categoryId"],
+		searchText?: string,
+		page: number = 1,
+	): Promise<ServiceResponse<INotesResponse | null>> {
+		try {
+			const notes = await this.noteRepository.getAllNotesInCategory(
+				userId,
+				categoryId,
+				searchText,
+				page,
+			);
+			const validatedNotes = NotesResponseSchema.parse(notes);
+			return ServiceResponse.success<INotesResponse>(defaultSuccessMessage, validatedNotes);
 		} catch (error) {
 			return ServiceResponse.failure(serverErrorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}

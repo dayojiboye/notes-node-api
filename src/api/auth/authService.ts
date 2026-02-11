@@ -1,4 +1,4 @@
-import { ILogin, ISignup, LoginSchema, SignupSchema } from "@/schemas/auth";
+import { ILogin, ISignup } from "@/schemas/auth";
 import { AuthRepository } from "./authRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
 import { IAuthResponse } from "@/schemas/user";
@@ -20,12 +20,6 @@ class AuthService {
 
 	public async signup(payload: ISignup): Promise<ServiceResponse<IAuthResponse | null>> {
 		try {
-			const { error } = SignupSchema.shape.body.safeParse(payload);
-
-			if (error) {
-				return ServiceResponse.failure(error.message, null, StatusCodes.BAD_REQUEST);
-			}
-
 			const emailExists = await userService.getUserByEmail(payload.email);
 
 			if (emailExists) {
@@ -51,12 +45,6 @@ class AuthService {
 
 	public async login(payload: ILogin): Promise<ServiceResponse<IAuthResponse | null>> {
 		try {
-			const { error } = LoginSchema.shape.body.safeParse(payload);
-
-			if (error) {
-				return ServiceResponse.failure(error.message, null, StatusCodes.BAD_REQUEST);
-			}
-
 			const emailExists = await userService.getUserByEmail(payload.email);
 
 			if (!emailExists) {
