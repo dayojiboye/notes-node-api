@@ -3,9 +3,12 @@ import {
 	ICreateCategory,
 	ICategoryResponse,
 	ICategoriesResponse,
+	IGetCategory,
+	IUpdateCategory,
 } from "@/schemas/category";
 import Category from "./categoryModel";
 import sequelize from "@/config/dbconfig";
+import { WhereOptions } from "sequelize";
 
 export class CategoryRepository {
 	public async createCategory(
@@ -44,5 +47,31 @@ export class CategoryRepository {
 			order: [[sequelize.literal("notesCount"), "DESC"]],
 		});
 		return categories;
+	}
+
+	public async updateCategory(
+		userId: string,
+		categoryId: IGetCategory["categoryId"],
+		payload: IUpdateCategory,
+	): Promise<ICategoryResponse | null> {
+		const whereClause: WhereOptions = { categoryAuthorId: userId, id: categoryId };
+
+		const category = await Category.findOne({
+			where: whereClause,
+		});
+
+		if (!category) return null;
+
+		const [affectedRows] = await Category.update(payload, {
+			where: whereClause,
+		});
+
+		if (affectedRows === 0) return null;
+
+		const updatedCategory = await Category.findOne({
+			where: whereClause,
+		});
+
+		return updatedCategory;
 	}
 }

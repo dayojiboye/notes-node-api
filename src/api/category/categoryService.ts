@@ -4,10 +4,18 @@ import {
 	ICreateCategory,
 	ICategoriesResponse,
 	CategoriesResponseSchema,
+	IGetCategory,
+	IUpdateCategory,
+	ICategoryResponse,
+	CategoryResponseSchema,
 } from "@/schemas/category";
 import { CategoryRepository } from "./categoryRepository";
 import { ServiceResponse } from "@/common/models/serviceResponse";
-import { defaultSuccessMessage, serverErrorMessage } from "@/common/constants/messages";
+import {
+	categoryNotFoundMessage,
+	defaultSuccessMessage,
+	serverErrorMessage,
+} from "@/common/constants/messages";
 import { StatusCodes } from "http-status-codes";
 
 class CategoryService {
@@ -60,6 +68,29 @@ class CategoryService {
 				null,
 				StatusCodes.INTERNAL_SERVER_ERROR,
 			);
+		}
+	}
+
+	public async updateCategory(
+		userId: string,
+		categoryId: IGetCategory["categoryId"],
+		payload: IUpdateCategory,
+	): Promise<ServiceResponse<ICategoryResponse | null>> {
+		try {
+			const updatedCategory = await this.categoryRepository.updateCategory(
+				userId,
+				categoryId,
+				payload,
+			);
+
+			if (!updatedCategory) {
+				return ServiceResponse.failure(categoryNotFoundMessage, null, StatusCodes.NOT_FOUND);
+			}
+
+			const validatedCategory = CategoryResponseSchema.parse(updatedCategory);
+			return ServiceResponse.success(defaultSuccessMessage, validatedCategory);
+		} catch (error) {
+			return ServiceResponse.failure(serverErrorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

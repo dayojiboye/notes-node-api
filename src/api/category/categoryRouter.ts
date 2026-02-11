@@ -6,6 +6,8 @@ import {
 	CreateCategorySchema,
 	CategoryResponseSchema,
 	CategoriesResponseSchema,
+	UpdateCategorySchema,
+	GetCategorySchema,
 } from "@/schemas/category";
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import express, { Router } from "express";
@@ -45,3 +47,28 @@ categoryRegistry.registerPath({
 });
 
 categoryRouter.get("/", categoryController.getAllCategories);
+
+categoryRegistry.registerPath({
+	method: "patch",
+	path: `${apiBaseUrl}/category/{categoryId}`,
+	tags: ["Category Service"],
+	summary: "Update category",
+	request: {
+		params: GetCategorySchema.shape.params,
+		body: {
+			content: {
+				"application/json": {
+					schema: UpdateCategorySchema.shape.body,
+				},
+			},
+			required: true,
+		},
+	},
+	responses: createApiResponse(CategoryResponseSchema, "Success"),
+});
+
+categoryRouter.patch(
+	"/:categoryId",
+	validateRequest(UpdateCategorySchema),
+	categoryController.updateCategory,
+);
