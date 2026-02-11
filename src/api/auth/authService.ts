@@ -6,9 +6,9 @@ import { StatusCodes } from "http-status-codes";
 import jwt from "jsonwebtoken";
 import { userService } from "../user/userService";
 import {
-	defaultAuthErrorMessage,
 	defaultSuccessMessage,
 	serverErrorMessage,
+	unauthorizedMessage,
 } from "@/common/constants/messages";
 
 class AuthService {
@@ -60,13 +60,13 @@ class AuthService {
 			const emailExists = await userService.getUserByEmail(payload.email);
 
 			if (!emailExists) {
-				return ServiceResponse.failure(defaultAuthErrorMessage, null, StatusCodes.NOT_FOUND);
+				return ServiceResponse.failure(unauthorizedMessage, null, StatusCodes.UNAUTHORIZED);
 			}
 
 			const user = await this.authRepository.loginUser(payload);
 
 			if (!user) {
-				return ServiceResponse.failure(defaultAuthErrorMessage, null, StatusCodes.NOT_FOUND);
+				return ServiceResponse.failure(unauthorizedMessage, null, StatusCodes.UNAUTHORIZED);
 			}
 
 			const accessToken = this.createToken(user.id);

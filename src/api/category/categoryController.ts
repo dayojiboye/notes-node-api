@@ -20,6 +20,14 @@ class CategoryController {
 		);
 		return res.status(serviceResponse.statusCode).send(serviceResponse);
 	};
+
+	public deleteCategory: RequestHandler = async (req: Request, res: Response) => {
+		const serviceResponse = await categoryService.deleteCategory(
+			res.locals.user.id,
+			req.params.categoryId,
+		);
+		return res.status(serviceResponse.statusCode).send(serviceResponse);
+	};
 }
 
 export const categoryController = new CategoryController();

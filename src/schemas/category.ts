@@ -26,6 +26,7 @@ export const GetCategorySchema = z.object({
 });
 
 export const UpdateCategorySchema = z.object({
+	params: z.object({ categoryId: commonValidations.id }),
 	body: CategorySchema.partial(),
 });
 

@@ -93,6 +93,23 @@ class CategoryService {
 			return ServiceResponse.failure(serverErrorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	public async deleteCategory(
+		userId: string,
+		categoryId: IGetCategory["categoryId"],
+	): Promise<ServiceResponse<boolean | null>> {
+		try {
+			const deletedCategory = await this.categoryRepository.deleteCategory(userId, categoryId);
+
+			if (!deletedCategory) {
+				return ServiceResponse.failure(categoryNotFoundMessage, false, StatusCodes.NOT_FOUND);
+			}
+
+			return ServiceResponse.success(defaultSuccessMessage, true);
+		} catch (error) {
+			return ServiceResponse.failure(serverErrorMessage, null, StatusCodes.INTERNAL_SERVER_ERROR);
+		}
+	}
 }
 
 export const categoryService = new CategoryService();

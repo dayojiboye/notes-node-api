@@ -74,4 +74,19 @@ export class CategoryRepository {
 
 		return updatedCategory;
 	}
+
+	public async deleteCategory(
+		userId: string,
+		categoryId: IGetCategory["categoryId"],
+	): Promise<boolean> {
+		const whereClause: WhereOptions = { categoryAuthorId: userId, id: categoryId };
+
+		const category = await Category.findOne({ where: whereClause });
+
+		if (!category) return false;
+
+		const deletedRows = await Category.destroy({ where: whereClause });
+		if (deletedRows === 0) return false;
+		return true;
+	}
 }

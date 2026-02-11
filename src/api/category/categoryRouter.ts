@@ -12,6 +12,7 @@ import {
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import express, { Router } from "express";
 import { categoryController } from "./categoryController";
+import { z } from "zod";
 
 export const categoryRegistry = new OpenAPIRegistry();
 export const categoryRouter: Router = express.Router();
@@ -54,7 +55,7 @@ categoryRegistry.registerPath({
 	tags: ["Category Service"],
 	summary: "Update category",
 	request: {
-		params: GetCategorySchema.shape.params,
+		params: UpdateCategorySchema.shape.params,
 		body: {
 			content: {
 				"application/json": {
@@ -71,4 +72,21 @@ categoryRouter.patch(
 	"/:categoryId",
 	validateRequest(UpdateCategorySchema),
 	categoryController.updateCategory,
+);
+
+categoryRegistry.registerPath({
+	method: "delete",
+	path: `${apiBaseUrl}/category/{categoryId}`,
+	tags: ["Category Service"],
+	summary: "Delete category",
+	request: {
+		params: GetCategorySchema.shape.params,
+	},
+	responses: createApiResponse(z.boolean(), "Success"),
+});
+
+categoryRouter.delete(
+	"/:categoryId",
+	validateRequest(GetCategorySchema),
+	categoryController.deleteCategory,
 );
